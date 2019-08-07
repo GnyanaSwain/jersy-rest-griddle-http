@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ofss</groupId>
+	<artifactId>JersyRestApiExample</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>JersyRestApiExample Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<jersey.version>2.17</jersey.version><!-- 1.18.3 -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- maven.compiler.source/target tag is used for maven to compile your 
+			code with jdk 1.8 else it will compile with jdk 1.5 -->
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+	  <dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.glassfish.jersey</groupId>
+				<artifactId>jersey-bom</artifactId>
+				<version>${jersey.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-grizzly2-http</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+		</dependency>
+	<!--<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>3.8.1</version>
+		<scope>test</scope>
+	</dependency>
+	<dependency>
+		<groupId>com.sun.jersey</groupId>
+		<artifactId>jersey-servlet</artifactId>
+		<version>1.18.3</version>
+	</dependency>
+	<dependency>
+		<groupId>com.sun.jersey</groupId>
+		<artifactId>jersey-json</artifactId>
+		<version>1.18.3</version>
+	</dependency>
+	<dependency>
+		<groupId>commons-logging</groupId>
+		<artifactId>commons-logging</artifactId>
+		<version>1.2</version>
+	</dependency> -->
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
+				<!-- The below configuration tag is used to copy the war file and deploy 
+					into tomcat server -->
+				<configuration>
+					<!-- Tomcat deployment -->
+					<!--<outputDirectory>D:\apache-tomcat-8.5.24\webapps\</outputDirectory>-->
+					<!-- Jboss deployment -->
+					<!--<outputDirectory>D:\wildfly-17.0.1.Final\standalone\deployments\</outputDirectory> -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
