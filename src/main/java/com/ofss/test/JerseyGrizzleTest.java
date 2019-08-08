@@ -1,4 +1,4 @@
-package com.main.test;
+package com.ofss.test;
 
 import java.io.IOException;
 import java.net.URI;
