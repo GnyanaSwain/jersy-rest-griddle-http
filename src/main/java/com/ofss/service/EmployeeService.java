@@ -1,10 +1,23 @@
 package com.ofss.service;
 
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.core.Response;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import com.ofss.bean.Employee;
 import com.ofss.bean.Status;
@@ -61,7 +74,55 @@ public class EmployeeService {
 		Employee employee = employeeIdMap.get(empid);
 		return Response.status(200).entity(employee).build();
 	}
+	
+	public Status sendKafkaMessage(Employee employee) {
+		System.out.println("**sendKafkaMessage**");
+		Properties properties = new Properties();
+		properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "slc15bmw.us.oracle.com:9092");
+		properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+		properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
+		// Kafka Paroducer 
+		KafkaProducer<String, String> producer =new KafkaProducer<String,String>(properties);
+		ProducerRecord<String, String> record= new ProducerRecord<String, String>("empmsg_topic",employee.toString());
+		producer.send(record);
+		return new Status("SUCCESS ", " Employee Id: " + employee.getEmployeeId() + " Employee Name: "+employee.getEmployeName()+" Project Name: "+employee.getEmployeeProject());
+	}
+
+	public void getKafkaMessage() {
+		String topicName="empmsg_topic";
+		String groupName="empmsg-group";
+		System.out.println("**getKafkaMessage**");
+		Properties properties = new Properties();
+		properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "slc15bmw.us.oracle.com:9092");
+		properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+		properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+		properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG,groupName);
+		properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
+		
+		KafkaConsumer<String, String> consumer= new KafkaConsumer<String,String>(properties);
+		consumer.subscribe(Arrays.asList(topicName));
+		int temp=0;
+		System.out.println("Before While");
+		boolean flag=false;
+		while(true) 
+		{
+			System.out.println("Inside While");
+			ConsumerRecords<String,String> records =consumer.poll(Duration.ofMillis(100));
+			System.out.println("Before for loop");
+			for(ConsumerRecord<String, String> record : records)
+			{
+				flag=true;
+				System.out.println("key : " + record.key() + " , Value: " + record.value());
+				System.out.println("Partition : " + record.partition() + " , Offsete: " + record.offset());
+				break;
+			}	
+			if(flag)
+				break;
+		}			
+	
+	}
+	
 	public Status addEmployee(Employee employee) {
 		if (employee.getEmployeeId() == 0)
 			return new Status("Failed", "Employee id should not be zero");
@@ -75,6 +136,7 @@ public class EmployeeService {
 		if (empId <= 0)
 			return new Status("Failed ", "Employee id does not exist ");
 
+		
 		for (Employee emp : employeeIdMap.values()) {
 			if (empId == emp.getEmployeeId()) {
 				flag = true;
